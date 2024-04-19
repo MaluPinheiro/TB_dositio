@@ -4,7 +4,7 @@ export const checkExistence = (app) => async (request, reply) => {
 
     let user = request.body;
 
-    let result = await products.count({name: user.name});
+    let result = await users.count({name: user.name});
 
     if(result > 0) throw new ALREADY_EXISTS();
 }
