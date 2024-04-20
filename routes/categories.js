@@ -41,17 +41,15 @@ export default async function categories(app, options) {
 
     app.get('/categories/:id', async(request, reply) => {
         let id = request.params.id;
-        let category = await products.findOne({ _id: new app.mongo.ObjectId(id) });
+        let category = await categories.findOne({ _id: request.params.id });
         return category;
     })
 
     app.get('/categories/:id/products', {
         config: {logMe: true}
     }, async (request, reply) => {
-        let nameCategory = category.name;
-        let category = await products.findOne({ _id: new app.mongo.ObjectId(id) });
-        let categoriesProducts = await products.find({category: nameCategory}).toArray();
-        return categoriesProducts;
+        let category = await categories.findOne({ _id: request.params.id })
+        return await products.find({category: category.name}).toArray()
     });
 
     app.delete('/categories/:id', {
@@ -61,7 +59,7 @@ export default async function categories(app, options) {
     }, async (request, reply) => {
         let id = request.params.id;
 
-        await categories.deleteOne({ _id: new app.mongo.ObjectId(id) });
+        await categories.deleteOne({ _id: request.params.id });
 
         return reply.code(204).send();;
     });
@@ -74,7 +72,7 @@ export default async function categories(app, options) {
         let id = request.params.id;
         let category = request.body;
 
-        await categories.updateOne({ _id: new app.mongo.ObjectId(id) }, {
+        await categories.updateOne({ _id: request.params.id }, {
             $set: {
                 name: category.name,
                 img_url: category.img_url

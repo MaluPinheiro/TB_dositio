@@ -22,10 +22,11 @@ export default async function products(app, options) {
                 type: 'object',
                 properties: {
                     id: { type: 'integer' },
-                    name: { type: 'string' },
-                    qtd: { type: 'integer' }
+                    nameProduct: { type: 'string' },
+                    qtd: { type: 'integer' },
+                    category: {type: 'string'}
                 },
-                required: ['name', 'qtd']
+                required: ['nameProduct', 'qtd', 'category']
             }
         },
         config: {
@@ -41,7 +42,7 @@ export default async function products(app, options) {
 
     app.get('/products/:id', async (request, reply) => {
         let id =  request.params.id;
-        let product = await products.findOne({_id: new app.mongo.ObjectId(id)});
+        let product = await products.findOne({_id: request.params.id});
         
         return product;
     });
@@ -53,7 +54,7 @@ export default async function products(app, options) {
     }, async (request, reply) => {
         let id =  request.params.id;
         
-        await products.deleteOne({_id: new app.mongo.ObjectId(id)});
+        await products.deleteOne({_id: request.params.id});
         
         return reply.code(204).send();;
     });
@@ -66,7 +67,7 @@ export default async function products(app, options) {
         let id =  request.params.id;
         let product = request.body;
         
-        await products.updateOne({_id: new app.mongo.ObjectId(id)}, {
+        await products.updateOne({_id: request.params.id}, {
             $set: {
                 name: product.name,
                 qtd: product.qtd

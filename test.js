@@ -1,6 +1,7 @@
 import { test, describe } from 'node:test';
 import { equal, deepEqual } from 'node:assert';
 import { build, options } from './app.js';
+import { request } from 'node:http';
 
 describe('###Tests for Server Configuration', async(t) => {
     test('Testing options configuration file', async (t) => {
@@ -21,17 +22,60 @@ describe('###Tests for Server Configuration', async(t) => {
 describe('###Tests for Unauthenticated Routes', async(t) => {
     
     describe('##Success Requests', async(t) => {
-        test('# GET /products', async(t) => {
+        test('# POST /register', async(t) => {
             const app = await build(options);
 
             t.after(async() => {
                 await app.close();
             });
             const response = await app.inject({
-                method: 'GET',
-                url: '/products'
+                method: 'POST',
+                url: '/register',
+                body: {
+                    "_id": "1R",
+                    "username": "Maria",
+                    "password": "Abcd@1234",
+                    "isAdmin": "true"
+                }
             });
+            equal(response.statusCode, 200);
+        })
+        test('# POST /auth', async(t) => {
+            const app = await build(options);
 
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'POST',
+                url: '/auth',
+                body: {
+                    "_id": "1",
+                    "username": "Maria",
+                    "password": "Abcd@1234"
+                }
+            });
+            equal(response.statusCode, 200);
+        })
+        test('# POST /categories', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'POST',
+                url: '/categories',
+                body: {
+                    "_id": "2",
+                    "name": "Legumes",
+                    "img_url": "https://www.google.com/imgres?q=legumes%20imagens&imgurl=https%3A%2F%2Fstatic6.depositphotos.com%2F1064024%2F540%2Fi%2F450%2Fdepositphotos_5408850-stock-photo-assortment-of-fresh-vegetables.jpg&imgrefurl=https%3A%2F%2Fdepositphotos.com%2Fbr%2Fphotos%2Flegumes-coloridos.html&docid=1e3NUXPpNL9e6M&tbnid=fyLEgdnFKudJgM&vet=12ahUKEwjK-InCvNGFAxV0F7kGHS9aAGEQM3oECH4QAA..i&w=600&h=400&hcb=2&ved=2ahUKEwjK-InCvNGFAxV0F7kGHS9aAGEQM3oECH4QAA"
+                },
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
             equal(response.statusCode, 200);
         });
         test('# GET /categories', async(t) => {
@@ -47,13 +91,230 @@ describe('###Tests for Unauthenticated Routes', async(t) => {
 
             equal(response.statusCode, 200);
         });
+        test('# GET /categories', async(t) => {
+            const app = await build(options);
+
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'GET',
+                url: '/categories/2'
+            });
+
+            equal(response.statusCode, 200);
+        });
+        test('# GET /categories', async(t) => {
+            const app = await build(options);
+
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'GET',
+                url: '/categories/2/products'
+            });
+
+            equal(response.statusCode, 200);
+        });
+        test('# PUT /categories/4', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'PUT',
+                url: '/categories/4',
+                body: {
+                    "name": "Podão",
+                    "img_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5OhBqlHBfpq8sTg0597CEz54JF9-BDhGW0A&s"
+                },
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
+            equal(response.statusCode, 200);
+        });
+        test('# POST /products', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'POST',
+                url: '/products',
+                body: {
+                    "_id": "1",
+                    "nameProduct": "Suco",
+                    "qtd": "65",
+                    "category": "Liquidos"
+                },
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
+            equal(response.statusCode, 200);
+        });
+        test('# GET /products', async(t) => {
+            const app = await build(options);
+
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'GET',
+                url: '/products'
+            });
+            equal(response.statusCode, 200);
+        });
+        test('# GET /products', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'GET',
+                url: '/products/1'
+            });
+            equal(response.statusCode, 200);
+        });
+        test('# PUT /products/1', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'PUT',
+                url: '/products/1',
+                body: {
+                    "nameProduct": "Refrigerante",
+                    "qtd": "64",
+                    "category": "Liquidos"
+                },
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
+            equal(response.statusCode, 200);
+        });
     });
 
-    describe('##Bad Requests', async(t) => {
+    // FAZENDO TESTE PARA ERROS:
 
+    describe('##Internal Server Error', async(t) => {
+
+        test('# POST /products', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'POST',
+                url: '/products',
+                body: {
+                    "_id": "1",
+                    "nameProduct": "Água",
+                    "qtd": "290",
+                    "category": "Liquidos"
+                },
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
+            equal(response.statusCode, 500);
+        });
+        test('# POST /categories', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'POST',
+                url: '/categories',
+                body: {
+                    "_id": "2",
+                    "name": "Leite e Derivados",
+                    "img_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSDawxQt6Q6QSDDbjt--1AGka0kx5qzFl0-Q&s"
+                },
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
+            equal(response.statusCode, 500);
+        });
+        test('# POST /register', async(t) => {
+            const app = await build(options);
+
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'POST',
+                url: '/register',
+                body: {
+                    "_id": "1R",
+                    "username": "Rosana",
+                    "password": "Abcd@12345",
+                    "isAdmin": "true"
+                }
+            });
+            equal(response.statusCode, 500);
+        })
     });
 });
 
-describe('###Tests for Authenticated routes', async(t) => {
+describe('##Bad Request', async(t) => {
 
-});
+    test('# POST /products', async(t) => {
+        const app = await build(options);
+
+        t.after(async() => {
+            await app.close();
+        });
+        const response = await app.inject({
+            method: 'POST',
+            url: '/products',
+            body: {
+                "_id": "1",
+                "nameProduct": "Água",
+                "category": "Liquidos"
+            },
+            headers: {
+                "isAdmin": "true",
+                "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+            }
+        });
+        equal(response.statusCode, 400);
+    });
+    test('# POST /categories', async(t) => {
+        const app = await build(options);
+
+        t.after(async() => {
+            await app.close();
+        });
+        const response = await app.inject({
+            method: 'POST',
+            url: '/categories',
+            body: {
+                "_id": "1",
+                "name": "Leite e Derivados",
+            },
+            headers: {
+                "isAdmin": "true",
+                "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+            }
+        });
+        equal(response.statusCode, 400);
+    });
+})
