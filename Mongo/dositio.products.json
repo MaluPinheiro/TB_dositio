@@ -1,0 +1,30 @@
+[{
+  "_id": "2",
+  "nameProduct": "Abacaxi",
+  "qtd": 48,
+  "category": "Frutas"
+},
+{
+  "_id": "3",
+  "nameProduct": "Maracujá",
+  "qtd": 65,
+  "category": "Frutas"
+},
+{
+  "_id": "1",
+  "nameProduct": "Suco",
+  "qtd": 65,
+  "category": "Liquidos"
+},
+{
+  "_id": "4",
+  "nameProduct": "Vagem",
+  "qtd": 50,
+  "category": "Legumes"
+},
+{
+  "_id": "5",
+  "nameProduct": "Cenoura",
+  "qtd": 90,
+  "category": "Legumes"
+}]

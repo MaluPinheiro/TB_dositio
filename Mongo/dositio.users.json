@@ -1,0 +1,12 @@
+[{
+  "_id": "1R",
+  "username": "Maria",
+  "password": "Abcd@1234",
+  "isAdmin": true
+},
+{
+  "_id": "2",
+  "username": "Rosana",
+  "password": "Abcd@12345",
+  "isAdmin": true
+}]
