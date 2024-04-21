@@ -19,7 +19,7 @@ describe('###Tests for Server Configuration', async(t) => {
     });
 });
 
-describe('###Tests for Unauthenticated Routes', async(t) => {
+describe('###Tests for Authenticated Routes', async(t) => {
     
     describe('##Success Requests', async(t) => {
         test('# POST /register', async(t) => {
@@ -38,7 +38,7 @@ describe('###Tests for Unauthenticated Routes', async(t) => {
                     "isAdmin": "true"
                 }
             });
-            equal(response.statusCode, 200);
+            equal(response.statusCode, 201);
         })
         test('# POST /auth', async(t) => {
             const app = await build(options);
@@ -55,7 +55,7 @@ describe('###Tests for Unauthenticated Routes', async(t) => {
                     "password": "Abcd@1234"
                 }
             });
-            equal(response.statusCode, 200);
+            equal(response.statusCode, 201);
         })
         test('# POST /categories', async(t) => {
             const app = await build(options);
@@ -76,7 +76,7 @@ describe('###Tests for Unauthenticated Routes', async(t) => {
                     "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
                 }
             });
-            equal(response.statusCode, 200);
+            equal(response.statusCode, 201);
         });
         test('# GET /categories', async(t) => {
             const app = await build(options);
@@ -88,7 +88,6 @@ describe('###Tests for Unauthenticated Routes', async(t) => {
                 method: 'GET',
                 url: '/categories'
             });
-
             equal(response.statusCode, 200);
         });
         test('# GET /categories', async(t) => {
@@ -135,7 +134,23 @@ describe('###Tests for Unauthenticated Routes', async(t) => {
                     "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
                 }
             });
-            equal(response.statusCode, 200);
+            equal(response.statusCode, 204);
+        });
+        test('# DELETE /categories', async(t) => {
+            const app = await build(options);
+
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'DELETE',
+                url: '/categories/2',
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
+            equal(response.statusCode, 204);
         });
         test('# POST /products', async(t) => {
             const app = await build(options);
@@ -157,7 +172,7 @@ describe('###Tests for Unauthenticated Routes', async(t) => {
                     "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
                 }
             });
-            equal(response.statusCode, 200);
+            equal(response.statusCode, 201);
         });
         test('# GET /products', async(t) => {
             const app = await build(options);
@@ -202,7 +217,23 @@ describe('###Tests for Unauthenticated Routes', async(t) => {
                     "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
                 }
             });
-            equal(response.statusCode, 200);
+            equal(response.statusCode, 204);
+        });
+        test('# DELETE /products', async(t) => {
+            const app = await build(options);
+
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'DELETE',
+                url: '/products/1',
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
+            equal(response.statusCode, 204);
         });
     });
 
@@ -317,4 +348,70 @@ describe('##Bad Request', async(t) => {
         });
         equal(response.statusCode, 400);
     });
+
+    describe('##Unautorized (Invalid Token)', async(t) => {
+        test('# POST /products', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'POST',
+                url: '/products',
+                body: {
+                    "_id": "6",
+                    "nameProduct": "Uva",
+                    "qtd": "140",
+                    "category": "Frutas"
+                },
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "aeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
+            equal(response.statusCode, 401);
+        });
+        test('# POST /categories', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'POST',
+                url: '/categories',
+                body: {
+                    "_id": "1",
+                    "name": "Limpeza",
+                    "img_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPlCHeLqprNgziZvc4DxTKcPGiisTTtZynYA&s"
+                },
+                headers: {
+                    "isAdmin": "true",
+                    "x-acess-token": "aeyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiIxIiwidXNlcm5hbWUiOiJNYXJpYSIsImlhdCI6MTcxMzYyMjU1M30.yMsAtdVodtl_aOLbIV329sZwC24U8MWya70JywyBv4c"
+                }
+            });
+            equal(response.statusCode, 401);
+        });
+        test('# POST /categories (sem token)', async(t) => {
+            const app = await build(options);
+    
+            t.after(async() => {
+                await app.close();
+            });
+            const response = await app.inject({
+                method: 'POST',
+                url: '/categories',
+                body: {
+                    "_id": "1",
+                    "name": "Limpeza",
+                    "img_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTPlCHeLqprNgziZvc4DxTKcPGiisTTtZynYA&s"
+                },
+                headers: {
+                    "isAdmin": "true",
+                }
+            });
+            equal(response.statusCode, 401);
+        });
+    })
 })
